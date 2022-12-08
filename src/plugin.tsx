@@ -6,7 +6,6 @@ import { ICommandPalette, InputDialog } from '@jupyterlab/apputils';
 import { IMainMenu, MainMenu } from '@jupyterlab/mainmenu';
 import { INotebookTracker } from '@jupyterlab/notebook';
 import { IStateDB } from '@jupyterlab/statedb';
-import { ISettingRegistry } from '@jupyterlab/settingregistry';
 import { ITranslator, nullTranslator } from '@jupyterlab/translation';
 
 import React from 'react';
@@ -18,19 +17,11 @@ import {
   DEFAULTS_PLUGIN_ID,
   ITourHandler,
   ITourManager,
-  IUserTourManager,
   PLUGIN_ID,
-  USER_PLUGIN_ID
 } from './tokens';
 import { TourHandler } from './tour';
 import { TourManager } from './tourManager';
-import { UserTourManager } from './userTourManager';
 
-console.log("graceal in plugin tsx");
-
-/**
- * Initialization data for the jupyterlab-tour extension.
- */
 const corePlugin: JupyterFrontEndPlugin<ITourManager> = {
   id: PLUGIN_ID,
   autoStart: true,
@@ -114,38 +105,6 @@ function activate(
   return manager;
 }
 
-/**
- * Optional plugin for user-defined tours stored in the settings registry
- */
-const userPlugin: JupyterFrontEndPlugin<IUserTourManager> = {
-  id: USER_PLUGIN_ID,
-  autoStart: true,
-  activate: activateUser,
-  requires: [ISettingRegistry, ITourManager],
-  optional: [ITranslator],
-  provides: IUserTourManager
-};
-
-function activateUser(
-  app: JupyterFrontEnd,
-  settings: ISettingRegistry,
-  tourManager: ITourManager,
-  translator?: ITranslator
-): IUserTourManager {
-  translator = translator || nullTranslator;
-
-  const manager = new UserTourManager({
-    tourManager,
-    translator,
-    getSettings: (): Promise<ISettingRegistry.ISettings> =>
-      settings.load(USER_PLUGIN_ID)
-  });
-  return manager;
-}
-
-/**
- * Optional plugin for the curated default tours and default toast behavior
- */
 const defaultsPlugin: JupyterFrontEndPlugin<void> = {
   id: DEFAULTS_PLUGIN_ID,
   autoStart: true,
@@ -177,4 +136,4 @@ function activateDefaults(
   });
 }
 
-export default [corePlugin, userPlugin, defaultsPlugin];
+export default [corePlugin, defaultsPlugin];
